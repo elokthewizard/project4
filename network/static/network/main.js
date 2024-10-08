@@ -40,3 +40,40 @@ function GetRequest(url, postData = null)
         })
     }
 }
+
+function MakeNewPost(event)
+{
+    // Prevent default, send form data to endpoint
+    event.preventDefault();
+
+    postData = {
+        postBody: document.querySelector('#postBody').value,
+    }
+
+    GetRequest("{% url 'make-new-post' %}", postData);
+}
+
+function GetAllPosts()
+{
+    GetRequest("{% url 'get-all-posts' %}");
+}
+
+function GetFollowingPosts()
+{
+    GetRequest("{% url 'get-following-posts' %}")
+}
+
+function GetUserProfile()
+{
+    GetRequest("{% url 'get-user-profile' %}")
+}
+
+function EditPost()
+{
+    GetRequest("{% url 'edit-post' %}")
+}
+
+function LikePost()
+{
+    GetRequest("{% url 'like-post' %}")
+}
