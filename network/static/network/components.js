@@ -1,9 +1,10 @@
 const App = () => {
     const urls = JSON.parse(document.getElementById('data-urls').getAttribute('data-urls'));
-    console.log(urls);
+    const isAuthenticated = document.getElementById('data-urls').getAttribute('data-authenticated') === 'true';
+    
     return (
     <div>
-        <NewPostForm GetRequest={GetRequest} urls={urls}/>
+        {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
     </div>
     )
 }

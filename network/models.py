@@ -5,8 +5,8 @@ from django.forms import ModelForm
 
 class User(AbstractUser):
     bio = models.CharField(max_length=128, blank=True)
-    following = models.ManyToManyField('self', symmetrical=False, related_name='following_users')
-    followed_by = models.ManyToManyField('self', symmetrical=False, related_name='followed_by_users')
+    following = models.ManyToManyField('self', symmetrical=False, related_name='following_users', blank=True)
+    followed_by = models.ManyToManyField('self', symmetrical=False, related_name='followed_by_users', blank=True)
 
 class Post(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)

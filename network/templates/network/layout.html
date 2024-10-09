@@ -58,7 +58,8 @@
                     "getUserProfile": "{% url "get-user-profile" %}",
                     "editPost": "{% url "edit-post" %}",
                     "likePost": "{% url "like-post" %}"
-                }'>
+                }'
+                data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
             </div>
             {% block body %}
             {% endblock %}
