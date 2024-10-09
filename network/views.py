@@ -1,8 +1,9 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import User
 
@@ -61,3 +62,42 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+@csrf_exempt
+def make_new_post(request):
+    if request.method == 'POST':
+        # Handle the creation of a new post
+        return JsonResponse({'message': 'Post created successfully'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def get_all_posts(request):
+    if request.method == 'GET':
+        # Handle fetching all posts
+        return JsonResponse({'posts': []})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def get_following_posts(request):
+    if request.method == 'GET':
+        # Handle fetching posts from followed users
+        return JsonResponse({'posts': []})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def get_user_profile(request):
+    if request.method == 'GET':
+        # Handle fetching a user's profile
+        return JsonResponse({'profile': {}})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def edit_post(request):
+    if request.method == 'POST':
+        # Handle editing a post
+        return JsonResponse({'message': 'Post edited successfully'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def like_post(request):
+    if request.method == 'POST':
+        # Handle liking a post
+        return JsonResponse({'message': 'Post liked successfully'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
