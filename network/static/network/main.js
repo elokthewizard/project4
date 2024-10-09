@@ -1,7 +1,4 @@
-function GetAllPosts()
-{
-    GetRequest("{% url 'get-all-posts' %}");
-}
+
 
 function GetFollowingPosts()
 {

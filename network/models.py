@@ -15,7 +15,7 @@ class Post(models.Model):
     liked_by = models.ManyToManyField(User, blank=True, related_name="liked_by")
 
     def __str__(self):
-        return f'{self.user.username}: {self.content[:20]}'
+        return f'{self.author.username}: {self.body[:20]}...'
     
 class PostForm(ModelForm):
     class Meta:

@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.core import serializers
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -73,8 +74,8 @@ def make_new_post(request):
 
         if request.user.is_authenticated and post_body:
             print(f'New post by {request.user.username}: {post_body}')
-            # post = Post(author=request.user, body=post_body)
-            # post.save()
+            post = Post(author=request.user, body=post_body)
+            post.save()
             return JsonResponse({'message': 'Post created successfully'})
         else:
             return JsonResponse({'error': 'Authentication required or empty post body'}, status=400)
@@ -83,8 +84,18 @@ def make_new_post(request):
 
 def get_all_posts(request):
     if request.method == 'GET':
-        # Handle fetching all posts
-        return JsonResponse({'posts': []})
+        posts = Post.objects.select_related('author').all()
+        posts_data = [
+            {
+                "id": post.pk,
+                "author": post.author.username,
+                "body": post.body,
+                "time": post.time,
+                "liked_by": [user.username for user in post.liked_by.all()]
+            }
+            for post in posts
+        ]
+        return JsonResponse(posts_data, safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def get_following_posts(request):

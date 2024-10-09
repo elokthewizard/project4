@@ -5,6 +5,8 @@ const App = () => {
     return (
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
+
+        <AllPostsFeed GetRequest={GetRequest} urls={urls} />
     </div>
     )
 }
@@ -27,45 +29,29 @@ const getCookie = (name) => {
 
 const GetRequest = (url, postData = null) =>
 {
+    const options = {
+        headers: {
+            'Content-Type': 'application/json'
+        },
+    };
+
     // if post data was passed, POST
-    if (postData != null)
-    {
-        fetch(url,
-        {
-            method: "POST",
-            body: JSON.stringify(postData),
-            headers: 
-            {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrfToken')
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data)
-        })
-        .catch(error => {
-            console.error("Error:", error)
-        })
+    if (postData != null) {
+        options.nmethod = "POST"
+        options.body = JSON.stringify(postData);
+        options.headers['X-CSRFToken'] = getCookie('csrfToken');
     }
     // otherwise GET
-    else
-    {
-        fetch(url,
-        {
-            headers: 
-            {
-                'Content-Type': 'application/json'
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Bad network response')
             }
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data)
+            return response.json();
         })
         .catch(error => {
-            console.error("Error:", error)
+            console.error("Error:", error);
         })
-    }
 }
 
 const NewPostForm = ({GetRequest, urls}) => {
@@ -84,6 +70,39 @@ const NewPostForm = ({GetRequest, urls}) => {
                 <input type="text" id="postBody" name="postBody" />
                 <button type="submit">Post</button>
             </form>
+        </div>
+    )
+}
+
+const AllPostsFeed = ({GetRequest, urls}) => {
+    const[posts, setPosts] = React.useState([]);
+
+    
+    React.useEffect(() => {
+        const fetchPosts = async () => {
+            const data = await GetRequest(urls.getAllPosts)
+            console.log(data)
+            if (data) 
+            {
+                setPosts(data)
+            }
+            else
+            {
+                console.error("Failed to fetch posts")
+            }
+        }
+        fetchPosts();
+    }, [GetRequest, urls.getAllPosts]);
+
+    return (
+        <div>
+            {posts.map((post, index) => (
+                <div key={index}>
+                    <h2>@{post.author}</h2>
+                    <p>{post.body}</p>
+                    <small>{new Date(post.time).toLocaleString()}</small>
+                </div>
+            ))}
         </div>
     )
 }
