@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+import json
 
-from .models import User
+from .models import *
 
 
 def index(request):
@@ -67,7 +68,17 @@ def register(request):
 def make_new_post(request):
     if request.method == 'POST':
         # Handle the creation of a new post
-        return JsonResponse({'message': 'Post created successfully'})
+        data = json.loads(request.body)
+        post_body = data.get('postBody', '')
+
+        if request.user.is_authenticated and post_body:
+            print(f'New post by {request.user.username}: {post_body}')
+            # post = Post(author=request.user, body=post_body)
+            # post.save()
+            return JsonResponse({'message': 'Post created successfully'})
+        else:
+            return JsonResponse({'error': 'Authentication required or empty post body'}, status=400)
+        
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def get_all_posts(request):

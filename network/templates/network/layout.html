@@ -6,10 +6,17 @@
         <title>{% block title %}Social Network{% endblock %}</title>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
         <link href="{% static 'network/styles.css' %}" rel="stylesheet">
-        <script src="{% static 'network/main.js' %}"></script>
+        <!-- React CDN -->
+        <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+        <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+        <!-- Babel CDN (to transpile JSX if using JSX) -->
+        <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+        <!-- React components -->
+        <script type="text/babel" src="{% static 'network/components.js' %}"></script>
+        <!-- Main App -->
+        <script type="text/babel" src="{% static 'network/main.js' %}"></script>
     </head>
     <body>
-
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
             <a class="navbar-brand" href="#">Network</a>
           
@@ -43,6 +50,16 @@
           </nav>
         
         <div class="body">
+            <div id="data-urls" 
+                data-urls='{
+                    "makeNewPost": "{% url "make-new-post" %}",
+                    "getAllPosts": "{% url "get-all-posts" %}",
+                    "getFollowingPosts": "{% url "get-following-posts" %}",
+                    "getUserProfile": "{% url "get-user-profile" %}",
+                    "editPost": "{% url "edit-post" %}",
+                    "likePost": "{% url "like-post" %}"
+                }'>
+            </div>
             {% block body %}
             {% endblock %}
         </div>
