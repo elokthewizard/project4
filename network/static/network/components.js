@@ -1,17 +1,49 @@
 const App = () => {
     const [profile, setProfile] = React.useState(null);
+    const {view, setView} = useView();
     const urls = JSON.parse(document.getElementById('data-urls').getAttribute('data-urls'));
     const isAuthenticated = document.getElementById('data-urls').getAttribute('data-authenticated') === 'true';
     
+    React.useEffect(() => {
+        const navbar = document.querySelector('.navbar-nav');
+
+        const handleNavBarClick = (event) => {
+            event.preventDefault();
+            const targetId = event.target.id;
+
+            if (targetId === 'all-posts-link') {
+                setView("DefaultFeed");
+            } else if (targetId === 'following-link') {
+                setView("FollowingFeed");
+            }
+        }
+
+        if (navbar) {
+            navbar.addEventListener("click", handleNavBarClick)
+        }
+
+        return () => {
+            if (navbar) {
+                navbar.removeEventListener('click', handleNavBarClick)
+            }
+        }
+    }, [setView])
+
     return (
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
-        {!profile && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>}
-        {profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile}/>}
+        {view === "DefaultFeed" && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>}
+        {view === "FollowingFeed" && <FollowingFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>}
+        {view === "ViewProfile" && profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile}/>}
         
     </div>
     )
+}
+
+const useView = () => {
+    const [view, setView] = React.useState("DefaultFeed");
+    return { view, setView };
 }
 
 const useFetchPosts = (GetRequest, url) => {

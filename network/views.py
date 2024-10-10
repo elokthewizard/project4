@@ -100,8 +100,19 @@ def get_all_posts(request):
 
 def get_following_posts(request):
     if request.method == 'GET':
-        # Handle fetching posts from followed users
-        return JsonResponse({'posts': []})
+        user = request.user
+        following_users = user.following.all()
+        posts = Post.objects.filter(author__in=following_users).select_related('author')
+        posts_data = [
+            {
+                "id": post.pk,
+                "author": post.author.username,
+                "body": post.body,
+                "time": post.time,
+                "liked_by": [user.username for user in post.liked_by.all()]
+            } for post in posts
+        ]
+        return JsonResponse(posts_data, safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def get_user_profile(request, username):
