@@ -59,7 +59,8 @@
                     "editPost": "{% url "edit-post" %}",
                     "likePost": "{% url "like-post" %}"
                 }'
-                data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+                data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"
+                data-username="{% if user.is_authenticated %}{{ user.username }}{% endif %}">
             </div>
             {% block body %}
             {% endblock %}

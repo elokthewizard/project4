@@ -1,8 +1,12 @@
 const App = () => {
     const [profile, setProfile] = React.useState(null);
     const {view, setView} = useView();
+
     const urls = JSON.parse(document.getElementById('data-urls').getAttribute('data-urls'));
     const isAuthenticated = document.getElementById('data-urls').getAttribute('data-authenticated') === 'true';
+    const loggedInUser = document.getElementById('data-urls').getAttribute('data-username');
+
+    console.log(loggedInUser)
     
     React.useEffect(() => {
         const navbar = document.querySelector('.navbar-nav');
@@ -41,9 +45,9 @@ const App = () => {
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
-        {view === "DefaultFeed" && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>}
-        {view === "FollowingFeed" && <FollowingFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>}
-        {view === "ViewProfile" && profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>}
+        {view === "DefaultFeed" && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser} />}
+        {view === "FollowingFeed" && <FollowingFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser} />}
+        {view === "ViewProfile" && profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser} />}
         
     </div>
     )
@@ -137,7 +141,14 @@ const NewPostForm = ({GetRequest, urls}) => {
     )
 }
 
-const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick }) => {
+const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, loggedInUser }) => {
+    const editPost = (postId) => {
+        console.log(`Editing post with ID: ${postId}`);
+        // Your editing logic...
+    };
+
+    console.log("FEED: " + loggedInUser)
+    
     return (
         <div>
             {posts.map((post, index) => (
@@ -149,13 +160,16 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick }) => {
                     <p>{post.body}</p>
                     <small>{new Date(post.time).toLocaleString()}</small>
                     <small>Likes: {post.liked_by.length}</small>
+                    {post.author.toLowerCase() === loggedInUser.toLowerCase() && (
+                        <button onClick={()=> editPost(post.id)}>Edit</button>
+                    )}
                 </div>
             ))}
         </div>
     )
 }
 
-const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
+const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, loggedInUser}) => {
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
 
@@ -171,29 +185,30 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
                 GetRequest={GetRequest} 
                 setProfile={setProfile} 
                 handleUsernameClick={handleUsernameClick}
+                loggedInUser={loggedInUser}
             />
             <Pagination 
                 currentPage={currentPage} 
                 totalPages={totalPages} 
-                onPageChange={handlePageChange} 
+                onPageChange={handlePageChange}
             />
         </div>
     )
 }
 
-const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
+const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, loggedInUser}) => {
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
 
     return (
         <div>
-            <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>
+            <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser}/>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
     )
 }
 
-const UserProfile = ({urls, profile, setProfile, handleUsernameClick}) => {
+const UserProfile = ({urls, profile, setProfile, handleUsernameClick, loggedInUser}) => {
     if (!profile) return <div>Loading...</div>;
 
     return (
@@ -203,7 +218,7 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick}) => {
         <p>Following: {profile.following.length}</p>
         <div>
             <h2>Posts</h2>
-            <Feed posts={profile.posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick} />
+            <Feed posts={profile.posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser}/>
         </div>
     </div>
     )
