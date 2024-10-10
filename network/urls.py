@@ -11,7 +11,7 @@ urlpatterns = [
     path('make-new-post/', views.make_new_post, name='make-new-post'),
     path('get-all-posts/', views.get_all_posts, name='get-all-posts'),
     path('get-following-posts/', views.get_following_posts, name='get-following-posts'),
-    path('get-user-profile/', views.get_user_profile, name='get-user-profile'),
+    path('get-user-profile/<str:username>/', views.get_user_profile, name='get-user-profile'),
     path('edit-post/', views.edit_post, name='edit-post'),
     path('like-post/', views.like_post, name='like-post'),
 ]

@@ -1,4 +1,5 @@
 const App = () => {
+    const [profile, setProfile] = React.useState(null);
     const urls = JSON.parse(document.getElementById('data-urls').getAttribute('data-urls'));
     const isAuthenticated = document.getElementById('data-urls').getAttribute('data-authenticated') === 'true';
     
@@ -6,9 +7,29 @@ const App = () => {
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
-        <AllPostsFeed GetRequest={GetRequest} urls={urls} />
+        <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>
+        {profile && <UserProfile profile={profile} />}
+        
     </div>
     )
+}
+
+const useFetchPosts = (GetRequest, url) => {
+    const [posts, setPosts] = React.useState([]);
+
+    React.useEffect(() => {
+        const fetchPosts = async () => {
+            const data = await GetRequest(url);
+            if (data) {
+                setPosts(data);
+            } else {
+                console.error("Failed to fetch posts");
+            }
+        };
+        fetchPosts();
+    }, [GetRequest, url])
+
+    return posts;
 }
 
 const getCookie = (name) => {
@@ -74,36 +95,54 @@ const NewPostForm = ({GetRequest, urls}) => {
     )
 }
 
-const AllPostsFeed = ({GetRequest, urls}) => {
-    const[posts, setPosts] = React.useState([]);
+const AllPostsFeed = ({GetRequest, urls, setProfile}) => {
+    const posts = useFetchPosts(GetRequest, urls.getAllPosts);
 
-    
-    React.useEffect(() => {
-        const fetchPosts = async () => {
-            const data = await GetRequest(urls.getAllPosts)
-            console.log(data)
-            if (data) 
-            {
-                setPosts(data)
-            }
-            else
-            {
-                console.error("Failed to fetch posts")
-            }
-        }
-        fetchPosts();
-    }, [GetRequest, urls.getAllPosts]);
+    const handleUsernameClick = async (event, username) => {
+        event.preventDefault()
+        const userProfileUrl = urls.getUserProfile.replace('username_placeholder', username)
+        const data = await GetRequest(userProfileUrl);
+        setProfile(data);
+    }
 
     return (
         <div>
             {posts.map((post, index) => (
                 <div key={index}>
-                    <h2>@{post.author}</h2>
+                    <a href={`${urls.getUserProfile.replace('/username_placeholder', post.author)}`}
+                    onClick = {(event) => {
+                        handleUsernameClick(event, post.author);
+                    }}>@{post.author}</a>
                     <p>{post.body}</p>
                     <small>{new Date(post.time).toLocaleString()}</small>
+                    <small>Likes: {post.liked_by.length}</small>
                 </div>
             ))}
         </div>
+    )
+}
+
+
+
+const UserProfile = ({profile}) => {
+    if (!profile) return <div>Loading...</div>;
+
+    return (
+    <div>
+        <h1>{profile.username}</h1>
+        <p>Followers: {profile.followers.length}</p>
+        <p>Following: {profile.following.length}</p>
+        <div>
+            <h2>Posts</h2>
+            {profile.posts.map((post, index) => (
+                <div key={index}>
+                    <p>{post.body}</p>
+                    <small>{new Date(post.time).toLocaleString()}</small>
+                    <small>Likes: {post.liked_by.length}</small>
+                </div>
+            ))}
+        </div>
+    </div>
     )
 }
 

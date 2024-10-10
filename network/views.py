@@ -104,10 +104,29 @@ def get_following_posts(request):
         return JsonResponse({'posts': []})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def get_user_profile(request):
+def get_user_profile(request, username):
     if request.method == 'GET':
         # Handle fetching a user's profile
-        return JsonResponse({'profile': {}})
+        user = User.objects.get(username=username)
+        posts = Post.objects.filter(author=user)
+        followers = user.followed_by.all().values('username')
+        following = user.following.all().values('username')
+
+        response_data = {
+            "username": user.username,
+            "followers": list(followers),
+            "following": list(following),
+            "posts": [
+                {
+                    "body": post.body,
+                    "time": post.time,
+                    "liked_by": list(post.liked_by.all().values('username'))
+                } for post in posts
+            ]
+        }
+
+        return JsonResponse(response_data, safe=False)
+    
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @csrf_exempt
