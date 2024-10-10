@@ -7,7 +7,7 @@ const App = () => {
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
-        <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>
+        {!profile && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>}
         {profile && <UserProfile profile={profile} />}
         
     </div>
