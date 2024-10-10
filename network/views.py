@@ -118,6 +118,7 @@ def get_user_profile(request, username):
             "following": list(following),
             "posts": [
                 {
+                    "author": post.author.username,
                     "body": post.body,
                     "time": post.time,
                     "liked_by": list(post.liked_by.all().values('username'))
