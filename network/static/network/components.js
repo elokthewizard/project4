@@ -29,13 +29,21 @@ const App = () => {
         }
     }, [setView])
 
+    const handleUsernameClick = async (event, username, urls, GetRequest, setProfile) => {
+        event.preventDefault()
+        setView("ViewProfile");
+        const userProfileUrl = urls.getUserProfile.replace('username_placeholder', username)
+        const data = await GetRequest(userProfileUrl);
+        setProfile(data);
+    }
+
     return (
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
-        {view === "DefaultFeed" && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>}
-        {view === "FollowingFeed" && <FollowingFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile}/>}
-        {view === "ViewProfile" && profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile}/>}
+        {view === "DefaultFeed" && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>}
+        {view === "FollowingFeed" && <FollowingFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>}
+        {view === "ViewProfile" && profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>}
         
     </div>
     )
@@ -127,14 +135,7 @@ const NewPostForm = ({GetRequest, urls}) => {
     )
 }
 
-const handleUsernameClick = async (event, username, urls, GetRequest, setProfile) => {
-    event.preventDefault()
-    const userProfileUrl = urls.getUserProfile.replace('username_placeholder', username)
-    const data = await GetRequest(userProfileUrl);
-    setProfile(data);
-}
-
-const Feed = ({ posts, urls, GetRequest, setProfile }) => {
+const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick }) => {
     return (
         <div>
             {posts.map((post, index) => (
@@ -152,23 +153,23 @@ const Feed = ({ posts, urls, GetRequest, setProfile }) => {
     )
 }
 
-const AllPostsFeed = ({GetRequest, urls, setProfile}) => {
+const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
     const posts = useFetchPosts(GetRequest, urls.getAllPosts);
 
     return (
-        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile}/>
+        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>
     )
 }
 
-const FollowingFeed = ({GetRequest, urls, setProfile}) => {
+const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
     const posts = useFetchPosts(GetRequest, urls.getFollowingPosts);
 
     return (
-        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile}/>
+        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>
     )
 }
 
-const UserProfile = ({urls, profile, setProfile}) => {
+const UserProfile = ({urls, profile, setProfile, handleUsernameClick}) => {
     if (!profile) return <div>Loading...</div>;
 
     return (
@@ -178,7 +179,7 @@ const UserProfile = ({urls, profile, setProfile}) => {
         <p>Following: {profile.following.length}</p>
         <div>
             <h2>Posts</h2>
-            <Feed posts={profile.posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} />
+            <Feed posts={profile.posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick} />
         </div>
     </div>
     )
