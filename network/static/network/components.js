@@ -54,22 +54,24 @@ const useView = () => {
     return { view, setView };
 }
 
-const useFetchPosts = (GetRequest, url) => {
+const useFetchPosts = (GetRequest, url, currentPage) => {
     const [posts, setPosts] = React.useState([]);
+    const [totalPages, setTotalPages] = React.useState(1);
 
     React.useEffect(() => {
         const fetchPosts = async () => {
-            const data = await GetRequest(url);
+            const data = await GetRequest(`${url}?page=${currentPage}`);
             if (data) {
-                setPosts(data);
+                setPosts(data.posts);
+                setTotalPages(data.pages)
             } else {
                 console.error("Failed to fetch posts");
             }
         };
         fetchPosts();
-    }, [GetRequest, url])
+    }, [GetRequest, url, currentPage])
 
-    return posts;
+    return { posts, totalPages };
 }
 
 const getCookie = (name) => {
@@ -154,18 +156,40 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick }) => {
 }
 
 const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
-    const posts = useFetchPosts(GetRequest, urls.getAllPosts);
+    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
+    const [currentPage, setCurrentPage] = React.useState(1);
+
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    }
 
     return (
-        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>
+        <div>
+            <Feed 
+                posts={posts} 
+                urls={urls} 
+                GetRequest={GetRequest} 
+                setProfile={setProfile} 
+                handleUsernameClick={handleUsernameClick}
+            />
+            <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                onPageChange={handlePageChange} 
+            />
+        </div>
     )
 }
 
 const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick}) => {
-    const posts = useFetchPosts(GetRequest, urls.getFollowingPosts);
+    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
+    const [currentPage, setCurrentPage] = React.useState(1);
 
     return (
-        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>
+        <div>
+            <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick}/>
+            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+        </div>
     )
 }
 
@@ -184,5 +208,34 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick}) => {
     </div>
     )
 }
+
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            onPageChange(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            onPageChange(currentPage + 1);
+        }
+    };
+
+    return (
+        <div className="pagination">
+            <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                Previous
+            </button>
+            <span>
+                Page {currentPage} of {totalPages}
+            </span>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                Next
+            </button>
+        </div>
+    );
+};
+
 
 ReactDOM.render(<App />, document.getElementById('root'));

@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.core import serializers
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -84,7 +85,12 @@ def make_new_post(request):
 
 def get_all_posts(request):
     if request.method == 'GET':
-        posts = Post.objects.select_related('author').all()
+        posts_list = Post.objects.select_related('author').all()
+        paginator = Paginator(posts_list, 10)
+
+        page_number = request.GET.get('page')
+        posts = paginator.get_page(page_number)
+
         posts_data = [
             {
                 "id": post.pk,
@@ -95,7 +101,13 @@ def get_all_posts(request):
             }
             for post in posts
         ]
-        return JsonResponse(posts_data, safe=False)
+
+        response_data = {
+            'posts': posts_data,
+            'page': posts.number,
+            'pages': posts.paginator.num_pages
+        }
+        return JsonResponse(response_data, safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def get_following_posts(request):
