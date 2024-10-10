@@ -102,17 +102,15 @@ const handleUsernameClick = async (event, username, urls, GetRequest, setProfile
     setProfile(data);
 }
 
-const AllPostsFeed = ({GetRequest, urls, setProfile}) => {
-    const posts = useFetchPosts(GetRequest, urls.getAllPosts);
-
+const Feed = ({ posts, urls, GetRequest, setProfile }) => {
     return (
         <div>
             {posts.map((post, index) => (
                 <div key={index}>
-                    <a href={`${urls.getUserProfile.replace('/username_placeholder', post.author)}`}
-                    onClick = {(event) => {
-                        handleUsernameClick(event, post.author, urls, GetRequest, setProfile);
-                    }}>@{post.author}</a>
+                    <a 
+                        href="#" 
+                        onClick={(event) => handleUsernameClick(event, post.author, urls, GetRequest, setProfile)}
+                    >@{post.author}</a>
                     <p>{post.body}</p>
                     <small>{new Date(post.time).toLocaleString()}</small>
                     <small>Likes: {post.liked_by.length}</small>
@@ -122,7 +120,21 @@ const AllPostsFeed = ({GetRequest, urls, setProfile}) => {
     )
 }
 
+const AllPostsFeed = ({GetRequest, urls, setProfile}) => {
+    const posts = useFetchPosts(GetRequest, urls.getAllPosts);
 
+    return (
+        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile}/>
+    )
+}
+
+const FollowingFeed = ({GetRequest, urls, setProfile}) => {
+    const posts = useFetchPosts(GetRequest, urls.getFollowingPosts);
+
+    return (
+        <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile}/>
+    )
+}
 
 const UserProfile = ({urls, profile, setProfile}) => {
     if (!profile) return <div>Loading...</div>;
@@ -134,17 +146,7 @@ const UserProfile = ({urls, profile, setProfile}) => {
         <p>Following: {profile.following.length}</p>
         <div>
             <h2>Posts</h2>
-            {profile.posts.map((post, index) => (
-                <div key={index}>
-                    <a href={`${urls.getUserProfile.replace('/username_placeholder', post.author)}`}
-                    onClick = {(event) => {
-                        handleUsernameClick(event, post.author, urls, GetRequest, setProfile);
-                    }}>@{post.author}</a>
-                    <p>{post.body}</p>
-                    <small>{new Date(post.time).toLocaleString()}</small>
-                    <small>Likes: {post.liked_by.length}</small>
-                </div>
-            ))}
+            <Feed posts={profile.posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} />
         </div>
     </div>
     )
