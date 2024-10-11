@@ -33,10 +33,10 @@ const App = () => {
 
     const handleUsernameClick = async (event, username, urls, GetRequest, setProfile) => {
         event.preventDefault()
-        setView("ViewProfile");
         const userProfileUrl = urls.getUserProfile.replace('username_placeholder', username)
         const data = await GetRequest(userProfileUrl);
         setProfile(data);
+        setView("ViewProfile");
     }
 
     const handlePageChange = (newPage) => {
@@ -274,9 +274,11 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handl
 }
 
 const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost}) => {
-    if (!profile) return <div>Loading...</div>;
-    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
+
+    if (!profile) return <div>Loading...</div>;
+    // const { posts, totalPages } = useFetchPosts(GetRequest, urls.getUserProfile, currentPage);
+    
 
     return (
     <div>
@@ -295,8 +297,8 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePage
                 editPost={editPost}
             />
             <Pagination 
-                currentPage={currentPage} 
-                totalPages={totalPages} 
+                currentPage={profile.page} 
+                totalPages={profile.pages} 
                 handlePageChange={handlePageChange} 
             />
         </div>
