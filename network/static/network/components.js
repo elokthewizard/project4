@@ -280,7 +280,7 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
                 <div key={index}>
                     <a 
                         href="#" 
-                        onClick={(event) => handleUsernameClick(event, post.author, urls, GetRequest, setProfil, postLikes)}
+                        onClick={(event) => handleUsernameClick(event, post.author, urls, GetRequest, setProfile, postLikes)}
                     >@{post.author}</a>
                     <p>{post.body}</p>
                     <small>{new Date(post.time).toLocaleString()}</small>
