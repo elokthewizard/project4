@@ -211,6 +211,21 @@ def edit_post(request, id):
 @csrf_exempt
 def like_post(request):
     if request.method == 'POST':
-        # Handle liking a post
-        return JsonResponse({'message': 'Post liked successfully'})
+        try:
+            data = json.loads(request.body)
+            post_id = data.get('postId')
+            post = Post.objects.get(pk=post_id)
+            if (request.user in post.liked_by.all()):
+                post.liked_by.remove(request.user)
+                message = "Post unliked successfully"
+            else:
+                post.liked_by.add(request.user)
+                message = "Post liked successfully"
+            post.save()
+            updated_like_count = post.liked_by.count()
+            return JsonResponse({'message': message, 'updated_like_count': updated_like_count})
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found'}, status=404)
+        except (json.JSONDecodeError, KeyError):
+            return JsonResponse({'error': 'Invalid data'}, status=400)
     return JsonResponse({'error': 'Invalid request'}, status=400)
