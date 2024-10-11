@@ -5,8 +5,6 @@ const App = () => {
     const urls = JSON.parse(document.getElementById('data-urls').getAttribute('data-urls'));
     const isAuthenticated = document.getElementById('data-urls').getAttribute('data-authenticated') === 'true';
     const loggedInUser = document.getElementById('data-urls').getAttribute('data-username');
-
-    console.log(loggedInUser)
     
     React.useEffect(() => {
         const navbar = document.querySelector('.navbar-nav');
@@ -174,8 +172,6 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
         console.log(`Editing post with ID: ${postId}`);
         // Your editing logic...
     };
-
-    console.log("FEED: " + loggedInUser)
     
     return (
         <div>

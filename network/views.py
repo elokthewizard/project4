@@ -74,7 +74,6 @@ def make_new_post(request):
         post_body = data.get('postBody', '')
 
         if request.user.is_authenticated and post_body:
-            print(f'New post by {request.user.username}: {post_body}')
             post = Post(author=request.user, body=post_body)
             post.save()
             return JsonResponse({'message': 'Post created successfully'})
