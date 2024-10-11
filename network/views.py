@@ -114,7 +114,12 @@ def get_following_posts(request):
     if request.method == 'GET':
         user = request.user
         following_users = user.following.all()
-        posts = Post.objects.filter(author__in=following_users).select_related('author')
+        posts_list = Post.objects.filter(author__in=following_users).select_related('author')
+        paginator = Paginator(posts_list, 10)
+
+        page_number = request.GET.get('page')
+        posts = paginator.get_page(page_number)
+
         posts_data = [
             {
                 "id": post.pk,
@@ -124,7 +129,13 @@ def get_following_posts(request):
                 "liked_by": [user.username for user in post.liked_by.all()]
             } for post in posts
         ]
-        return JsonResponse(posts_data, safe=False)
+
+        response_data = {
+            'posts': posts_data,
+            'page': posts.number,
+            'pages': posts.paginator.num_pages
+        }
+        return JsonResponse(response_data, safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def get_user_profile(request, username):

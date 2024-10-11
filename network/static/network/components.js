@@ -141,6 +141,34 @@ const NewPostForm = ({GetRequest, urls}) => {
     )
 }
 
+const Pagination = ({ currentPage, totalPages, handlePageChange }) => {
+    const handlePrevPage = () => {
+        if (currentPage > 1) {
+            handlePageChange(currentPage - 1);
+        }
+    };
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            handlePageChange(currentPage + 1);
+        }
+    };
+
+    return (
+        <div className="pagination">
+            <button onClick={handlePrevPage} disabled={currentPage === 1}>
+                Previous
+            </button>
+            <span>
+                Page {currentPage} of {totalPages}
+            </span>
+            <button onClick={handleNextPage} disabled={currentPage === totalPages}>
+                Next
+            </button>
+        </div>
+    );
+};
+
 const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, loggedInUser }) => {
     const editPost = (postId) => {
         console.log(`Editing post with ID: ${postId}`);
@@ -190,7 +218,7 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, logged
             <Pagination 
                 currentPage={currentPage} 
                 totalPages={totalPages} 
-                onPageChange={handlePageChange}
+                handlePageChange={handlePageChange}
             />
         </div>
     )
@@ -200,10 +228,25 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, logge
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
 
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    }
+
     return (
         <div>
-            <Feed posts={posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser}/>
-            <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+            <Feed 
+                posts={posts} 
+                urls={urls} 
+                GetRequest={GetRequest} 
+                setProfile={setProfile} 
+                handleUsernameClick={handleUsernameClick} 
+                loggedInUser={loggedInUser}
+            />
+            <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                handlePageChange={handlePageChange} 
+            />
         </div>
     )
 }
@@ -223,34 +266,5 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick, loggedInUs
     </div>
     )
 }
-
-const Pagination = ({ currentPage, totalPages, onPageChange }) => {
-    const handlePrevPage = () => {
-        if (currentPage > 1) {
-            onPageChange(currentPage - 1);
-        }
-    };
-
-    const handleNextPage = () => {
-        if (currentPage < totalPages) {
-            onPageChange(currentPage + 1);
-        }
-    };
-
-    return (
-        <div className="pagination">
-            <button onClick={handlePrevPage} disabled={currentPage === 1}>
-                Previous
-            </button>
-            <span>
-                Page {currentPage} of {totalPages}
-            </span>
-            <button onClick={handleNextPage} disabled={currentPage === totalPages}>
-                Next
-            </button>
-        </div>
-    );
-};
-
 
 ReactDOM.render(<App />, document.getElementById('root'));
