@@ -172,7 +172,24 @@ def get_user_profile(request, username):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @csrf_exempt
-def edit_post(request):
+def edit_post(request, id):
+    if request.method == "GET":
+        try:
+            post = Post.objects.get(pk=id, author=request.user)
+            post_data = {
+                "id": post.pk,
+                "author": post.author.username,
+                "body": post.body,
+                "time": post.time,
+                "liked_by": [user.username for user in post.liked_by.all()]
+            }
+        
+            print(post_data)
+
+            return JsonResponse(post_data, safe=False)
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found/ unauthorized request'})
+    
     if request.method == 'POST':
         # Handle editing a post
         return JsonResponse({'message': 'Post edited successfully'})

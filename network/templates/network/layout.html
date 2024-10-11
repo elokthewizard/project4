@@ -56,7 +56,7 @@
                     "getAllPosts": "{% url "get-all-posts" %}",
                     "getFollowingPosts": "{% url "get-following-posts" %}",
                     "getUserProfile": "{% url "get-user-profile" "username_placeholder" %}",
-                    "editPost": "{% url "edit-post" %}",
+                    "editPost": "edit-post/post_id_placeholder",
                     "likePost": "{% url "like-post" %}"
                 }'
                 data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}"

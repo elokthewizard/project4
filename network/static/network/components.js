@@ -43,9 +43,17 @@ const App = () => {
         setCurrentPage(newPage);
     }
 
-    const editPost = (postId) => {
+    const editPost = async (postId) => {
         console.log(`Editing post with ID: ${postId}`);
-        // Your editing logic...
+        const postIdUrl = urls.editPost.replace('post_id_placeholder', postId)
+        const data = await GetRequest(postIdUrl);
+        console.log('');
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                console.log(`${key}: ${data[key]}`)
+            }
+        }
+        console.log('');
     };
 
     return (
