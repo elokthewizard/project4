@@ -2,6 +2,9 @@ const App = () => {
     const [profile, setProfile] = React.useState(null);
     const {view, setView} = useView();
 
+    const [currentPostId, setCurrentPostId] = React.useState(null)
+    const [postToEdit, setPostToEdit] = React.useState(null)
+
     const urls = JSON.parse(document.getElementById('data-urls').getAttribute('data-urls'));
     const isAuthenticated = document.getElementById('data-urls').getAttribute('data-authenticated') === 'true';
     const loggedInUser = document.getElementById('data-urls').getAttribute('data-username');
@@ -47,13 +50,9 @@ const App = () => {
         console.log(`Editing post with ID: ${postId}`);
         const postIdUrl = urls.editPost.replace('post_id_placeholder', postId)
         const data = await GetRequest(postIdUrl);
-        console.log('');
-        for (const key in data) {
-            if (data.hasOwnProperty(key)) {
-                console.log(`${key}: ${data[key]}`)
-            }
-        }
-        console.log('');
+
+        setPostToEdit(data);
+        setView("EditPost");
     };
 
     return (
@@ -69,7 +68,8 @@ const App = () => {
                 handlePageChange={handlePageChange}
                 loggedInUser={loggedInUser} 
                 editPost={editPost}
-            />}
+            />
+        }
         {view === "FollowingFeed" && 
             <FollowingFeed 
                 GetRequest={GetRequest} 
@@ -79,7 +79,8 @@ const App = () => {
                 handlePageChange={handlePageChange}
                 loggedInUser={loggedInUser} 
                 editPost={editPost}
-            />}
+            />
+        }
         {view === "ViewProfile" && profile && 
             <UserProfile 
                 GetRequest={GetRequest} 
@@ -90,7 +91,16 @@ const App = () => {
                 handlePageChange={handlePageChange}
                 loggedInUser={loggedInUser} 
                 editPost={editPost}
-            />}
+            />
+        }
+        {view === "EditPost" && postToEdit &&
+            <EditPostForm
+                GetRequest={GetRequest}
+                urls={urls}
+                postToEdit={postToEdit}
+                setView={setView}
+            />
+        }
         
     </div>
     )
@@ -147,7 +157,7 @@ const GetRequest = (url, postData = null) =>
 
     // if post data was passed, POST
     if (postData != null) {
-        options.nmethod = "POST"
+        options.method = "POST"
         options.body = JSON.stringify(postData);
         options.headers['X-CSRFToken'] = getCookie('csrfToken');
     }
@@ -179,6 +189,34 @@ const NewPostForm = ({GetRequest, urls}) => {
             <form onSubmit={MakeNewPost}>
                 <input type="text" id="postBody" name="postBody" />
                 <button type="submit">Post</button>
+            </form>
+        </div>
+    )
+}
+
+const EditPostForm = ({GetRequest, urls, postToEdit, setView}) => {
+    const [postBody, setPostBody] = React.useState(postToEdit.body);
+
+    const handleEditPost = async (event) => {
+        event.preventDefault();
+        const postIdUrl = urls.editPost.replace('post_id_placeholder', postToEdit.id)
+        const response = await GetRequest(postIdUrl, {
+            postBody
+        })
+        // console.log(response.message);
+        setView("DefaultFeed");
+    }
+    return (
+        <div>
+            <form onSubmit={handleEditPost}>
+                <input 
+                    type="text"
+                    id="postBody"
+                    name="postBody"
+                    value={postBody}
+                    onChange={(e) => setPostBody(e.target.value)}
+                />
+                <button type="submit">Update post</button>
             </form>
         </div>
     )
@@ -225,7 +263,7 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
                     <small>{new Date(post.time).toLocaleString()}</small>
                     <small>Likes: {post.liked_by.length}</small>
                     {post.author.toLowerCase() === loggedInUser.toLowerCase() && (
-                        <button onClick={()=> editPost(post.id)}>Edit</button>
+                        <button type="button" onClick={()=> editPost(post.id)}>Edit</button>
                     )}
                 </div>
             ))}

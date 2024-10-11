@@ -188,11 +188,24 @@ def edit_post(request, id):
 
             return JsonResponse(post_data, safe=False)
         except Post.DoesNotExist:
-            return JsonResponse({'error': 'Post not found/ unauthorized request'})
+            return JsonResponse({'error': 'Post not found/ unauthorized request'}, status=404)
     
     if request.method == 'POST':
         # Handle editing a post
-        return JsonResponse({'message': 'Post edited successfully'})
+        try:
+            data = json.loads(request.body)
+            post_body = data.get('postBody', '')
+
+            if request.user.is_authenticated and post_body:
+                post = Post.objects.get(pk=id, author=request.user)
+                post.body = post_body
+                post.save()
+                return JsonResponse({'message': 'Post updated successfully'})
+            else:
+                return JsonResponse({'error': 'Authentication required/ empty post body'})
+        except Post.DoesNotExist:
+            return JsonResponse({'error': 'Post not found or invalid data'}, status=404)
+        
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 @csrf_exempt
