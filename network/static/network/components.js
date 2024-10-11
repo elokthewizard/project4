@@ -39,13 +39,50 @@ const App = () => {
         setProfile(data);
     }
 
+    const handlePageChange = (newPage) => {
+        setCurrentPage(newPage);
+    }
+
+    const editPost = (postId) => {
+        console.log(`Editing post with ID: ${postId}`);
+        // Your editing logic...
+    };
+
     return (
     <div>
         {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
-        {view === "DefaultFeed" && <AllPostsFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser} />}
-        {view === "FollowingFeed" && <FollowingFeed GetRequest={GetRequest} urls={urls} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser} />}
-        {view === "ViewProfile" && profile && <UserProfile urls={urls} profile={profile} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser} />}
+        {view === "DefaultFeed" &&  
+            <AllPostsFeed 
+                GetRequest={GetRequest} 
+                urls={urls} 
+                setProfile={setProfile} 
+                handleUsernameClick={handleUsernameClick} 
+                handlePageChange={handlePageChange}
+                loggedInUser={loggedInUser} 
+                editPost={editPost}
+            />}
+        {view === "FollowingFeed" && 
+            <FollowingFeed 
+                GetRequest={GetRequest} 
+                urls={urls} 
+                setProfile={setProfile} 
+                handleUsernameClick={handleUsernameClick} 
+                handlePageChange={handlePageChange}
+                loggedInUser={loggedInUser} 
+                editPost={editPost}
+            />}
+        {view === "ViewProfile" && profile && 
+            <UserProfile 
+                GetRequest={GetRequest} 
+                urls={urls} 
+                profile={profile} 
+                setProfile={setProfile} 
+                handleUsernameClick={handleUsernameClick} 
+                handlePageChange={handlePageChange}
+                loggedInUser={loggedInUser} 
+                editPost={editPost}
+            />}
         
     </div>
     )
@@ -167,12 +204,7 @@ const Pagination = ({ currentPage, totalPages, handlePageChange }) => {
     );
 };
 
-const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, loggedInUser }) => {
-    const editPost = (postId) => {
-        console.log(`Editing post with ID: ${postId}`);
-        // Your editing logic...
-    };
-    
+const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, loggedInUser, editPost }) => {
     return (
         <div>
             {posts.map((post, index) => (
@@ -193,13 +225,9 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
     )
 }
 
-const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, loggedInUser}) => {
+const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost}) => {
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
-
-    const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
-    }
 
     return (
         <div>
@@ -210,6 +238,7 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, logged
                 setProfile={setProfile} 
                 handleUsernameClick={handleUsernameClick}
                 loggedInUser={loggedInUser}
+                editPost={editPost}
             />
             <Pagination 
                 currentPage={currentPage} 
@@ -220,13 +249,9 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, logged
     )
 }
 
-const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, loggedInUser}) => {
+const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost}) => {
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
-
-    const handlePageChange = (newPage) => {
-        setCurrentPage(newPage);
-    }
 
     return (
         <div>
@@ -237,6 +262,7 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, logge
                 setProfile={setProfile} 
                 handleUsernameClick={handleUsernameClick} 
                 loggedInUser={loggedInUser}
+                editPost={editPost}
             />
             <Pagination 
                 currentPage={currentPage} 
@@ -247,8 +273,10 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, logge
     )
 }
 
-const UserProfile = ({urls, profile, setProfile, handleUsernameClick, loggedInUser}) => {
+const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost}) => {
     if (!profile) return <div>Loading...</div>;
+    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
+    const [currentPage, setCurrentPage] = React.useState(1);
 
     return (
     <div>
@@ -257,7 +285,20 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick, loggedInUs
         <p>Following: {profile.following.length}</p>
         <div>
             <h2>Posts</h2>
-            <Feed posts={profile.posts} urls={urls} GetRequest={GetRequest} setProfile={setProfile} handleUsernameClick={handleUsernameClick} loggedInUser={loggedInUser}/>
+            <Feed 
+                posts={profile.posts} 
+                urls={urls} 
+                GetRequest={GetRequest} 
+                setProfile={setProfile} 
+                handleUsernameClick={handleUsernameClick} 
+                loggedInUser={loggedInUser}
+                editPost={editPost}
+            />
+            <Pagination 
+                currentPage={currentPage} 
+                totalPages={totalPages} 
+                handlePageChange={handlePageChange} 
+            />
         </div>
     </div>
     )

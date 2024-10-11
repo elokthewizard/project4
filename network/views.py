@@ -84,7 +84,7 @@ def make_new_post(request):
 
 def get_all_posts(request):
     if request.method == 'GET':
-        posts_list = Post.objects.select_related('author').all()
+        posts_list = Post.objects.select_related('author').order_by('-time').all()
         paginator = Paginator(posts_list, 10)
 
         page_number = request.GET.get('page')
@@ -113,7 +113,7 @@ def get_following_posts(request):
     if request.method == 'GET':
         user = request.user
         following_users = user.following.all()
-        posts_list = Post.objects.filter(author__in=following_users).select_related('author')
+        posts_list = Post.objects.filter(author__in=following_users).select_related('author').order_by('-time')
         paginator = Paginator(posts_list, 10)
 
         page_number = request.GET.get('page')
