@@ -209,6 +209,8 @@ const NewPostForm = ({GetRequest, urls}) => {
         }
 
         GetRequest(urls.makeNewPost, postData);
+        window.location.reload()
+        
     }
     return (
         <div>
@@ -298,8 +300,8 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
 }
 
 const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost, handleLikePost, postLikes}) => {
-    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
+    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
 
     return (
         <div>
