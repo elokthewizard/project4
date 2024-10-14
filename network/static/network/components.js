@@ -14,13 +14,15 @@ const App = () => {
         const navbar = document.querySelector('.navbar-nav');
 
         const handleNavBarClick = (event) => {
-            event.preventDefault();
             const targetId = event.target.id;
 
-            if (targetId === 'all-posts-link') {
-                setView("DefaultFeed");
-            } else if (targetId === 'following-link') {
-                setView("FollowingFeed");
+            if (targetId === "all-posts-link" || targetId === "following-link") {
+                event.preventDefault();
+                if (targetId === 'all-posts-link') {
+                    setView("DefaultFeed");
+                } else if (targetId === 'following-link') {
+                    setView("FollowingFeed");
+                }
             }
         }
 
@@ -349,16 +351,40 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handl
 
 const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost, handleLikePost, postLikes}) => {
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [isFollowing, setIsFOllowing] = React.useState(profile.isFollowing)
 
     if (!profile) return <div>Loading...</div>;
-    // const { posts, totalPages } = useFetchPosts(GetRequest, urls.getUserProfile, currentPage);
-    
+
+    const handleFollowUser = async () => {
+        const followUrl = urls.followUser.replace('username_placeholder', profile.username)
+        const response = await GetRequest(followUrl, {userId: loggedInUser}) 
+        console.log(response)
+        console.log(response.message)
+        console.log(response.updatedFollowers, response.updatedFollowing)
+
+        const updatedFollowers = response.updatedFollowers;
+        const updatedFollowing = response.updatedFollowing;
+
+        setProfile(prevProfile => ({
+            ...prevProfile,
+            isFollowing: !prevProfile.isFollowing,
+            followers: updatedFollowers,
+            following: updatedFollowing
+        }))
+
+        console.log(profile)
+    }
 
     return (
     <div>
         <h1>{profile.username}</h1>
         <p>Followers: {profile.followers.length}</p>
         <p>Following: {profile.following.length}</p>
+        {loggedInUser && loggedInUser !== profile.username && (
+            <button type="button" onClick={handleFollowUser}>
+                {profile.isFollowing ? 'Unfollow' : 'Follow'}
+            </button>
+        )}
         <div>
             <h2>Posts</h2>
             <Feed 

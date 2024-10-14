@@ -158,10 +158,13 @@ def get_user_profile(request, username):
             for post in posts
         ]
 
+        is_following = request.user in user.followed_by.all()
+
         response_data = {
             "username": user.username,
             "followers": list(user.followed_by.all().values('username')),
             "following": list(user.following.all().values('username')),
+            "isFollowing": is_following,
             "posts": posts_data,
             "page": posts.number,
             "pages": posts.paginator.num_pages
@@ -228,4 +231,28 @@ def like_post(request):
             return JsonResponse({'error': 'Post not found'}, status=404)
         except (json.JSONDecodeError, KeyError):
             return JsonResponse({'error': 'Invalid data'}, status=400)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def follow_user(request, username):
+    if request.method == 'POST':
+        try:
+            user_to_follow = User.objects.get(username=username)
+            if request.user in user_to_follow.followed_by.all():
+                user_to_follow.followed_by.remove(request.user)
+                message = 'Unfollowed successfully'
+            else:
+                user_to_follow.followed_by.add(request.user)
+                message = 'Followed successfully'
+            
+            updated_followers_list = list(user_to_follow.followed_by.all().values_list('username', flat=True))
+            updated_following_list = list(user_to_follow.following.all().values_list('username', flat=True))
+
+            return JsonResponse({
+                'message': message,
+                'updatedFollowers': updated_followers_list,
+                'updatedFollowing': updated_following_list
+            })
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'User not found'}, status=404)
     return JsonResponse({'error': 'Invalid request'}, status=400)
