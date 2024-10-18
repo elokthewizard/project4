@@ -326,8 +326,8 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handle
 }
 
 const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost, handleLikePost, postLikes}) => {
-    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
     const [currentPage, setCurrentPage] = React.useState(1);
+    const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
 
     return (
         <div>
@@ -360,9 +360,6 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePage
     const handleFollowUser = async () => {
         const followUrl = urls.followUser.replace('username_placeholder', profile.username)
         const response = await GetRequest(followUrl, {userId: loggedInUser}) 
-        console.log(response)
-        console.log(response.message)
-        console.log(response.updatedFollowers, response.updatedFollowing)
 
         const updatedFollowers = response.updatedFollowers;
         const updatedFollowing = response.updatedFollowing;
