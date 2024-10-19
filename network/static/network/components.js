@@ -214,9 +214,9 @@ const NewPostForm = ({GetRequest, urls}) => {
     }
     return (
         <div>
-            <form onSubmit={MakeNewPost}>
-                <input type="text" id="postBody" name="postBody" />
-                <button type="submit">Post</button>
+            <form className="new-post-form" onSubmit={MakeNewPost}>
+            <textarea id="postBody" name="postBody" rows="4" cols="64"></textarea>
+                <button className="post-button" type="submit">Post</button>
             </form>
         </div>
     )
@@ -279,20 +279,27 @@ const Pagination = ({ currentPage, totalPages, handlePageChange }) => {
 
 const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, loggedInUser, editPost, handleLikePost, postLikes }) => {
     return (
-        <div>
+        <div className="feed">
             {posts.map((post, index) => (
-                <div key={index}>
-                    <a 
-                        href="#" 
-                        onClick={(event) => handleUsernameClick(event, post.author, urls, GetRequest, setProfile, postLikes)}
-                    >@{post.author}</a>
-                    <p>{post.body}</p>
-                    <small>{new Date(post.time).toLocaleString()}</small>
-                    <small>Likes: {postLikes[post.id] !== undefined ? postLikes[post.id] : post.liked_by.length}</small>
-                    {post.author.toLowerCase() === loggedInUser.toLowerCase() && (
-                        <button type="button" onClick={()=> editPost(post.id)}>Edit</button>
-                    )}
-                    <button onClick={() => handleLikePost(post.id)}>Like</button>
+                <div key={index} className="post">
+                    <div className="post-header">
+                        <a
+                            className="username-link"
+                            href="#"
+                            onClick={(event) => handleUsernameClick(event, post.author, urls, GetRequest, setProfile, postLikes)}
+                        >@{post.author}</a>
+                        {post.author.toLowerCase() === loggedInUser.toLowerCase() && (
+                            <button type="button" className="edit-button" onClick={()=> editPost(post.id)}>Edit</button>
+                        )}
+                    </div>
+                    <p className="post-body">{post.body}</p>
+                    <div className="post-info">
+                        <small>{new Date(post.time).toLocaleString()}</small>
+                        <small className="like-count">Likes: {postLikes[post.id] !== undefined ? postLikes[post.id] : post.liked_by.length}</small>
+                        <button className="like-button" onClick={() => handleLikePost(post.id)}>Like</button>
+                    </div>
+                    
+                    
                 </div>
             ))}
         </div>
@@ -370,15 +377,15 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePage
             followers: updatedFollowers,
             following: updatedFollowing
         }))
-
-        console.log(profile)
     }
 
     return (
     <div>
-        <h1>{profile.username}</h1>
-        <p>Followers: {profile.followers.length}</p>
-        <p>Following: {profile.following.length}</p>
+        <h1>@{profile.username}</h1>
+        <div className="profile-info">
+            <p>Followers: {profile.followers.length}</p>
+            <p>Following: {profile.following.length}</p>
+        </div>
         {loggedInUser && loggedInUser !== profile.username && (
             <button type="button" onClick={handleFollowUser}>
                 {profile.isFollowing ? 'Unfollow' : 'Follow'}
