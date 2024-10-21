@@ -77,7 +77,7 @@ const App = () => {
 
     return (
     <div>
-        {isAuthenticated && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
+        {isAuthenticated && view != "EditPost" && <NewPostForm GetRequest={GetRequest} urls={urls}/>}
 
         {view === "DefaultFeed" &&  
             <AllPostsFeed 
@@ -213,9 +213,14 @@ const NewPostForm = ({GetRequest, urls}) => {
         
     }
     return (
-        <div>
+        <div className="form-container">
             <form className="new-post-form" onSubmit={MakeNewPost}>
-            <textarea id="postBody" name="postBody" rows="4" cols="64"></textarea>
+            <textarea 
+                id="postBody" 
+                name="postBody" 
+                rows="4" 
+                cols="64">    
+            </textarea>
                 <button className="post-button" type="submit">Post</button>
             </form>
         </div>
@@ -234,16 +239,17 @@ const EditPostForm = ({GetRequest, urls, postToEdit, setView}) => {
         setView("DefaultFeed");
     }
     return (
-        <div>
-            <form onSubmit={handleEditPost}>
-                <input 
+        <div className="form-container">
+            <form className="edit-post-form" onSubmit={handleEditPost}>
+                <textarea 
                     type="text"
                     id="postBody"
                     name="postBody"
                     value={postBody}
                     onChange={(e) => setPostBody(e.target.value)}
-                />
-                <button type="submit">Update post</button>
+                    rows="4" cols="64">
+                </textarea>
+                <button className="post-button" type="submit">Update post</button>
             </form>
         </div>
     )
