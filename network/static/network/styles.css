@@ -1,3 +1,12 @@
+body {
+    background-color: lightblue;
+}
+
+.feed {
+    background-color: lightcyan;
+    border-radius: 12px;
+}
+
 #root {
     display: flex;
     justify-content: center;
@@ -11,10 +20,6 @@
     padding-bottom: 0;
 }
 
-.feed {
-    border: solid black;
-}
-
 .new-post-form,
 .edit-post-form {
     display: flex;
@@ -22,9 +27,9 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    margin-top: 0;
+    margin-top: 12px;
     padding-top: 0;
-    margin-bottom: 0;
+    margin-bottom: 12px;
     padding-bottom: 0;
 }
 
@@ -32,21 +37,37 @@
     width: 100%;
 }
 
-.post-button {
+.textarea-wrapper {
+    position: relative;
     display: flex;
-    margin-left: auto;
-    width: min-content;
-    padding: 0.75rem 2rem;
+    justify-content: space-between;
+    align-items: flex-end;
 }
 
 textarea {
+    padding: 0.5rem;
     resize: none;
+    border-radius: 12px;
+    width: 100%;
+    box-sizing: border-box;
+    padding-right: 160px;
+}
+
+.post-button {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    width: min-content;
+    padding: 0.75rem 2rem;
+    border-radius: 12px;
 }
 
 .post {
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
+    border-radius: 12px;
 }
 
 .post-header {
@@ -56,12 +77,14 @@ textarea {
 .edit-button {
     display: flex;
     margin-left: auto;
+    border-radius: 8px;
 }
 
 .post-body {
     display: flex;
     flex-direction: column;
-    max-width: 40ch;
+    max-width: 60ch;
+    padding: 1rem 0;
     margin: 0 auto;
 }
 
@@ -73,12 +96,13 @@ textarea {
 
 .like-count {
     margin-left: auto;
+    margin-right: 1rem;
 }
 
 .like-button {
     display: flex;
-    margin-left: auto;
-    padding: 0.5rem 1rem;
+    padding: 0.25rem 1rem;
+    border-radius: 12px;
 }
 
 .profile-info {
@@ -100,9 +124,22 @@ form {
 }
 
 .post:nth-child(odd) {
-    background-color: #f0f0f0;  /* Light gray for odd posts */
+    background-color: azure;  /* Light gray for odd posts */
 }
 
 .post:nth-child(even) {
-    background-color: #ffffff;  /* White for even posts */
+    background-color: white;  /* White for even posts */
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 100%;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+.pagination button {
+    border-radius: 8px;
 }

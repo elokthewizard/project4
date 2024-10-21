@@ -219,13 +219,15 @@ const NewPostForm = ({GetRequest, urls}) => {
     return (
         <div className="form-container">
             <form className="new-post-form" onSubmit={MakeNewPost}>
-            <textarea 
-                id="postBody" 
-                name="postBody" 
-                rows="4" 
-                cols="64">    
-            </textarea>
+            <div className="textarea-wrapper">
+                <textarea
+                    id="postBody"
+                    name="postBody"
+                    rows="4"
+                    cols="64">
+                </textarea>
                 <button className="post-button" type="submit">Post</button>
+            </div>
             </form>
         </div>
     )
@@ -245,15 +247,17 @@ const EditPostForm = ({GetRequest, urls, postToEdit, setView}) => {
     return (
         <div className="form-container">
             <form className="edit-post-form" onSubmit={handleEditPost}>
-                <textarea 
-                    type="text"
-                    id="postBody"
-                    name="postBody"
-                    value={postBody}
-                    onChange={(e) => setPostBody(e.target.value)}
-                    rows="4" cols="64">
-                </textarea>
-                <button className="post-button" type="submit">Update post</button>
+                <div className="textarea-wrapper">
+                    <textarea
+                        type="text"
+                        id="postBody"
+                        name="postBody"
+                        value={postBody}
+                        onChange={(e) => setPostBody(e.target.value)}
+                        rows="4" cols="64">
+                    </textarea>
+                    <button className="post-button" type="submit">Update post</button>
+                </div>
             </form>
         </div>
     )
