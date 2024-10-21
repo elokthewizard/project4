@@ -22,7 +22,6 @@
     align-items: center;
     justify-content: center;
     width: 100%;
-    border: solid red;
     margin-top: 0;
     padding-top: 0;
     margin-bottom: 0;
@@ -45,7 +44,6 @@ textarea {
 }
 
 .post {
-    border: dotted green;
     display: flex;
     flex-direction: column;
     padding: 0.5rem;
@@ -99,4 +97,12 @@ form {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.post:nth-child(odd) {
+    background-color: #f0f0f0;  /* Light gray for odd posts */
+}
+
+.post:nth-child(even) {
+    background-color: #ffffff;  /* White for even posts */
 }

@@ -287,7 +287,7 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
     return (
         <div className="feed">
             {posts.map((post, index) => (
-                <div key={index} className="post">
+                <div key={index} id={`post-${post.id}`} className="post">
                     <div className="post-header">
                         <a
                             className="username-link"
