@@ -3,6 +3,7 @@ const App = () => {
     const {view, setView} = useView();
 
     const [currentPostId, setCurrentPostId] = React.useState(null)
+    const [currentPage, setCurrentPage] = React.useState(1);
     const [postToEdit, setPostToEdit] = React.useState(null)
     const [postLikes, setPostLikes] = React.useState({})
 
@@ -50,6 +51,7 @@ const App = () => {
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
+        console.log('Page changed to: ', newPage)
     }
 
     const handleLikePost = async (postId) => {
@@ -324,6 +326,11 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handle
     const [currentPage, setCurrentPage] = React.useState(1);
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
 
+    React.useEffect(() => {
+        console.log('Current Page:', currentPage);
+        handlePageChange(currentPage);
+    }, [currentPage]);
+
     return (
         <div>
             <Feed 
@@ -340,7 +347,7 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handle
             <Pagination 
                 currentPage={currentPage} 
                 totalPages={totalPages} 
-                handlePageChange={handlePageChange}
+                handlePageChange={setCurrentPage}
             />
         </div>
     )
@@ -349,6 +356,10 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handle
 const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost, handleLikePost, postLikes}) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
+
+    React.useEffect(() => {
+        handlePageChange(currentPage);
+    }, [currentPage]);
 
     // Debugging statement
     console.log('Posts:', posts);
@@ -370,7 +381,7 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handl
             <Pagination 
                 currentPage={currentPage} 
                 totalPages={totalPages} 
-                handlePageChange={handlePageChange} 
+                handlePageChange={setCurrentPage} 
             />
         </div>
     )
@@ -379,6 +390,10 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handl
 const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost, handleLikePost, postLikes}) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const [isFollowing, setIsFOllowing] = React.useState(profile.isFollowing)
+
+    React.useEffect(() => {
+        handlePageChange(currentPage);
+    }, [currentPage, handlePageChange]);
 
     if (!profile) return <div>Loading...</div>;
 
@@ -425,7 +440,7 @@ const UserProfile = ({urls, profile, setProfile, handleUsernameClick, handlePage
             <Pagination 
                 currentPage={profile.page} 
                 totalPages={profile.pages} 
-                handlePageChange={handlePageChange} 
+                handlePageChange={setCurrentPage} 
             />
         </div>
     </div>
