@@ -11,11 +11,11 @@ const App = () => {
     const loggedInUser = document.getElementById('data-urls').getAttribute('data-username');
     
     React.useEffect(() => {
-        const navbar = document.querySelector('.navbar-nav');
+        const navbar = document.querySelector('.navbar');
 
         const handleNavBarClick = (event) => {
             const targetId = event.target.id;
-
+            console.log(`Clicked ID: ${targetId}`);
             if (targetId === "all-posts-link" || targetId === "following-link") {
                 event.preventDefault();
                 if (targetId === 'all-posts-link') {
@@ -23,7 +23,10 @@ const App = () => {
                 } else if (targetId === 'following-link') {
                     setView("FollowingFeed");
                 }
-            }
+            } else if (targetId == "home-button") {
+                event.preventDefault();
+                setView("DefaultFeed")
+            } 
         }
 
         if (navbar) {
@@ -145,6 +148,7 @@ const useFetchPosts = (GetRequest, url, currentPage) => {
         const fetchPosts = async () => {
             const data = await GetRequest(`${url}?page=${currentPage}`);
             if (data) {
+                console.log('Fetched Data:', data);
                 setPosts(data.posts);
                 setTotalPages(data.pages)
             } else {
@@ -341,6 +345,10 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handle
 const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handlePageChange, loggedInUser, setView, editPost, handleLikePost, postLikes}) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getFollowingPosts, currentPage);
+
+    // Debugging statement
+    console.log('Posts:', posts);
+    console.log('Total Pages:', totalPages);
 
     return (
         <div>

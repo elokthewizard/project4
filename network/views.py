@@ -111,9 +111,13 @@ def get_all_posts(request):
 
 def get_following_posts(request):
     if request.method == 'GET':
+        print(f"user: {request.user.username}")
         user = request.user
         following_users = user.following.all()
+        print(f"is following: {following_users}")
         posts_list = Post.objects.filter(author__in=following_users).select_related('author').order_by('-time')
+        print(f"lists: {posts_list}")
+
         paginator = Paginator(posts_list, 10)
 
         page_number = request.GET.get('page')
@@ -128,6 +132,7 @@ def get_following_posts(request):
                 "liked_by": [user.username for user in post.liked_by.all()]
             } for post in posts
         ]
+        print(f"post_data: {posts_data}")
 
         response_data = {
             'posts': posts_data,
@@ -238,11 +243,13 @@ def follow_user(request, username):
     if request.method == 'POST':
         try:
             user_to_follow = User.objects.get(username=username)
-            if request.user in user_to_follow.followed_by.all():
+            if user_to_follow in request.user.following.all():
                 user_to_follow.followed_by.remove(request.user)
+                request.user.following.remove(user_to_follow)
                 message = 'Unfollowed successfully'
             else:
                 user_to_follow.followed_by.add(request.user)
+                request.user.following.add(user_to_follow)
                 message = 'Followed successfully'
             
             updated_followers_list = list(user_to_follow.followed_by.all().values_list('username', flat=True))
