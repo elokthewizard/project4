@@ -230,8 +230,13 @@ def like_post(request):
                 post.liked_by.add(request.user)
                 message = "Post liked successfully"
             post.save()
+            liked_by_usernames = [user.username for user in post.liked_by.all()]
             updated_like_count = post.liked_by.count()
-            return JsonResponse({'message': message, 'updated_like_count': updated_like_count})
+            return JsonResponse({
+                'message': message, 
+                'liked_by': liked_by_usernames,
+                'updated_like_count': updated_like_count
+            })
         except Post.DoesNotExist:
             return JsonResponse({'error': 'Post not found'}, status=404)
         except (json.JSONDecodeError, KeyError):

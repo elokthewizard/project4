@@ -16,7 +16,7 @@ const App = () => {
 
         const handleNavBarClick = (event) => {
             const targetId = event.target.id;
-            console.log(`Clicked ID: ${targetId}`);
+            
             if (targetId === "all-posts-link" || targetId === "following-link") {
                 event.preventDefault();
                 if (targetId === 'all-posts-link') {
@@ -51,28 +51,24 @@ const App = () => {
 
     const handlePageChange = (newPage) => {
         setCurrentPage(newPage);
-        console.log('Page changed to: ', newPage)
     }
 
     const handleLikePost = async (postId) => {
         const likePostUrl = urls.likePost;
         const response = await GetRequest(likePostUrl, { postId });
-        console.log(response.message);
-
-        const updatedLikeCount = response.updated_like_count
-
-        console.log(updatedLikeCount)
 
         setPostLikes(prevPostLikes => ({
             ...prevPostLikes,
-            [postId]: updatedLikeCount
+            [postId]:  {
+                likes_count: response.updated_like_count,
+                liked_by: response.liked_by
+            }
         }));
-        console.log(`Post with id ${postId} has ${updatedLikeCount} likes`);  // Log the update
+        console.log(response.liked_by)
     };
     
 
     const editPost = async (postId) => {
-        console.log(`Editing post with ID: ${postId}`);
         const postIdUrl = urls.editPost.replace('post_id_placeholder', postId)
         const data = await GetRequest(postIdUrl);
 
@@ -150,7 +146,6 @@ const useFetchPosts = (GetRequest, url, currentPage) => {
         const fetchPosts = async () => {
             const data = await GetRequest(`${url}?page=${currentPage}`);
             if (data) {
-                console.log('Fetched Data:', data);
                 setPosts(data.posts);
                 setTotalPages(data.pages)
             } else {
@@ -311,11 +306,16 @@ const Feed = ({ posts, urls, GetRequest, setProfile, handleUsernameClick, logged
                     <p className="post-body">{post.body}</p>
                     <div className="post-info">
                         <small>{new Date(post.time).toLocaleString()}</small>
-                        <small className="like-count">Likes: {postLikes[post.id] !== undefined ? postLikes[post.id] : post.liked_by.length}</small>
-                        <button className="like-button" onClick={() => handleLikePost(post.id)}>Like</button>
+                        <small className="like-count">Likes: {postLikes[post.id] !== undefined ? postLikes[post.id].likes_count : post.liked_by.length}</small>
+                        <button className="like-button" onClick={() => handleLikePost(post.id)}>
+                        {
+                            (postLikes[post.id]?.liked_by.includes(loggedInUser)) || 
+                            (post.liked_by.includes(loggedInUser)) 
+                                ? 'Unlike' 
+                                : 'Like' 
+                        }
+                        </button>
                     </div>
-                    
-                    
                 </div>
             ))}
         </div>
@@ -327,7 +327,6 @@ const AllPostsFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handle
     const { posts, totalPages } = useFetchPosts(GetRequest, urls.getAllPosts, currentPage);
 
     React.useEffect(() => {
-        console.log('Current Page:', currentPage);
         handlePageChange(currentPage);
     }, [currentPage]);
 
@@ -360,10 +359,6 @@ const FollowingFeed = ({GetRequest, urls, setProfile, handleUsernameClick, handl
     React.useEffect(() => {
         handlePageChange(currentPage);
     }, [currentPage]);
-
-    // Debugging statement
-    console.log('Posts:', posts);
-    console.log('Total Pages:', totalPages);
 
     return (
         <div>
